@@ -1,0 +1,132 @@
+---
+title: "Iteration"
+author: "Leiyu Yue"
+date: "11/8/2017"
+output: html_document
+---
+
+## Simple function
+```{r}
+library(tidyverse)
+
+
+theme_set(theme_bw())
+theme_update(legend.position = "bottom")
+
+set.seed(1)
+
+```
+
+```{r}
+x = rnorm(25)
+
+mean(x) / sd(x)
+```
+
+```{r}
+z_score = function(x) {
+  
+  z = mean(x) / sd(x)
+  return(z)
+  
+}
+
+z_score(x)
+z_score(sample(c(TRUE, FALSE), 25, replace = TRUE))
+```
+
+add some controls
+```{r}
+z_score = function(x) {
+  
+  if(!is.numeric(x)){
+    stop("x must be numeric")
+  } else if(length(x)<3){
+    stop("x must have length over 3")
+  }
+  
+  mean_x = mean(x)
+  sd_x = sd(x)
+  z = mean_x / sd_x
+  
+  data_frame(z = z,
+       mean = mean_x,
+       sd = sd_x)
+  
+}
+
+z_score(x)
+```
+
+## more interesting
+```{r}
+sim_data = tibble(
+  x = runif(30),
+  y = 2 + 3 * x + rnorm(30, 0, 1)
+)
+
+ls_fit = lm(y ~ x, data = sim_data)
+  
+beta0_hat = coef(ls_fit)[1]
+beta1_hat = coef(ls_fit)[2]
+```
+
+```{r}
+sim_regression = function(n, beta0, beta1) {
+  
+  sim_data = tibble(
+    x = runif(n),
+    y = beta0 + beta1 * x + rnorm(n, 0, 1)
+  )
+  
+  ls_fit = lm(y ~ x, data = sim_data)
+  
+  tibble(
+    beta0_hat = coef(ls_fit)[1],
+    beta1_hat = coef(ls_fit)[2]
+  )
+}
+```
+
+```{r}
+sim_regression(40,0,1)
+```
+
+## LoTR
+```{r}
+movie_name = read_excel()
+
+lotr = function(movie_name){
+  
+  clean_names() %>%
+  gather(key = sex, value = words, female:male) %>%
+  mutate(race = tolower(race),
+         movie = "movie_name")
+  
+  
+}
+```
+
+```{r}
+lotr = function(path = "./data/LotR_Words.xlsx", cell_range, movie_name){
+  df = read_excel(path, range = cell_range) %>%
+  clean_names() %>%
+  gather(key = sex, value = words, female:male) %>%
+  mutate(race = tolower(race),
+         movie = movie_name)
+  
+  df
+
+}
+```
+
+```{r}
+library(readxl)
+library(janitor)
+lotr(path = "./data/LotR_Words.xlsx", cell_range = "B3:D6", movie_name = "Fellowship" )
+```
+
+```{r}
+lotr(cell_range = "B3:D6", movie_name = "Fellowship" )
+```
+
